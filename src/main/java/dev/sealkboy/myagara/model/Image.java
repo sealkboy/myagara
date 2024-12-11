@@ -1,4 +1,4 @@
-package dev.sealkboy.myagara.model;
+-package dev.sealkboy.myagara.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -10,10 +10,10 @@ public class Image {
     private String id;
     private String filename;
     private long timestamp;
-    private String label; // Part of the report
-    private double confidence; // Part of the report
+    private String label;
+    private double confidence;
 
-    // Getters and Setters
+    
     public String getId() {
         return id;
     }
