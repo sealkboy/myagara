@@ -104,14 +104,17 @@ myagara/
 ## How to Run the Project
 
 ### 1. Training the Model
-   - Open the `myagara_model.py` file located in project directory.
-   - Ensure that you have installed the necessary Python dependencies.
-   - Execute the script to train the TensorFlow model using the PlantVillage dataset. The script will generate a model file named `myagara_final_model.h5`.
-   - Save the `myagara_final_model.h5` in a directory that the Flask server can access.
+   - Open the myagara_model.py file in Spyder or another Python IDE (not Visual Studio Code, due to compatibility issues with TensorFlow/Keras in VSC).
+   - Ensure you have installed the necessary Python dependencies, including TensorFlow and Keras.
+   - Execute the script to train the TensorFlow model using the PlantVillage dataset. The script will generate a model file named myagara_final_model.h5.
+   - Save the myagara_final_model.h5 in a directory accessible by the Flask server.
+
+Note: Running the model training in Visual Studio Code can cause issues due to conflicts between TensorFlow/Keras and the Python environment. Using Spyder ensures smooth execution.
 
 ### 2. Running the Flask Server
    - Navigate to the project directory containing `myagara_flask_server.py`.
-   - Install Flask and other dependencies.
+   - Use Spyder or the command line to run Flask server.
+   - Ensure you have installed Flask and other dependencies.
    - Run the Flask server.
    - Ensure the Flask server is running at `http://localhost:5000/classify`.
 
