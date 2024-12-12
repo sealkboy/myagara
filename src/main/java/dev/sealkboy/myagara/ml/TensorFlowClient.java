@@ -3,10 +3,11 @@ package dev.sealkboy.myagara.ml;
 import java.io.File;
 import java.util.Map;
 
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -42,17 +43,25 @@ public class TensorFlowClient {
             // Create the HTTP request
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
-            // Send POST request to Flask API
-            ResponseEntity<Map> response = restTemplate.postForEntity(FLASK_URL, requestEntity, Map.class);
+            // Use exchange method for type-safe response handling
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                FLASK_URL,
+                HttpMethod.POST,
+                requestEntity,
+                new ParameterizedTypeReference<Map<String, Object>>() {}
+            );
 
             // Handle response
-            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
                 Map<String, Object> responseBody = response.getBody();
 
                 // Extract data from the response and map it to the Image object
+                String label = (String) responseBody.getOrDefault("label", "unknown");
+                double confidence = Double.parseDouble(responseBody.getOrDefault("confidence", 0.0).toString());
+
                 Image image = new Image();
-                image.setLabel(responseBody.get("label").toString());
-                image.setConfidence(Double.parseDouble(responseBody.get("confidence").toString()));
+                image.setLabel(label);
+                image.setConfidence(confidence);
                 return image;
             } else {
                 throw new RuntimeException("Failed to classify image. Status: " + response.getStatusCode());

@@ -10,10 +10,10 @@ public class Image {
     private String id;
     private String filename;
     private long timestamp;
-    private String label; // Part of the report
-    private double confidence; // Part of the report
+    private String label;
+    private double confidence; 
 
-    // Getters and Setters
+
     public String getId() {
         return id;
     }
