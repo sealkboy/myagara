@@ -37,7 +37,7 @@ Myagara is an innovative project designed to classify plant diseases using machi
 ## Project Architecture
 
 1. **TensorFlow Model and Flask API**:
-   - TensorFlow model trained on the PlantVillage dataset (39 categories).
+   - TensorFlow model trained on the PlantVillage dataset (5 categories).
    - Flask API exposes a `/classify` endpoint for image classification.
 
 2. **Spring Boot Backend**:
