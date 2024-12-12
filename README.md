@@ -59,9 +59,9 @@ Myagara is an innovative project designed to classify plant diseases using machi
 | HTTP Method | Endpoint                       | Description                         | Response Example            |
 |-------------|--------------------------------|-------------------------------------|-----------------------------|
 | `POST`      | `/api/images/upload`          | Upload an image for classification | `"Image Uploaded"`          |
-| `GET`       | `/api/images`                 | Retrieve all classified images     | List of metadata & reports  |
-| `GET`       | `/api/images/{id}`            | Retrieve a specific image report   | Metadata & classification   |
-| `PUT`       | `/api/images/{id}`            | Update metadata for an image       | Updated metadata            |
+| `GET`       | `/api/images`                 | Retrieve all classified images     | List of all images (metadata & reports)  |
+| `GET`       | `/api/images/{id}`            | Retrieve a specific image report   | List of specific image (metadata & report)  |
+| `PUT`       | `/api/images/{id}`            | Update metadata for an image       | Specific image (w/ updated metadata & report)           |
 | `DELETE`    | `/api/images/{id}`            | Delete a specific image            | `"Image Deleted"`           |
 | `DELETE`    | `/api/images`                 | Delete all images                  | `"All Images Deleted"`      |
 
