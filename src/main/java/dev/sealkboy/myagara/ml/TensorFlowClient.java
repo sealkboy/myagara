@@ -23,9 +23,9 @@ public class TensorFlowClient {
     private static final String FLASK_URL = "http://localhost:5000/classify";
 
     /**
-     * Sends the image to the Flask API for classification.
-     * @param imageFile File object representing the image to classify.
-     * @return Image object with classification results.
+     * 
+     * @param imageFile 
+     * @return 
      */
     public Image classifyImage(File imageFile) {
         try {
