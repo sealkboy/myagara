@@ -6,7 +6,7 @@ Myagara is an innovative project designed to classify plant diseases using machi
 
 ## Key Features
 
-- **Plant Disease Classification**: Upload leaf images to classify them into one of 39 disease categories or mark them as healthy.
+- **Plant Disease Classification**: Upload leaf images to classify them into one of 5 disease categories or mark them as healthy.
 - **RESTful APIs**: Spring Boot backend provides endpoints to manage image uploads, retrieve metadata, and update reports.
 - **Secure Data Storage**: MongoDB stores metadata, classification results, and reports securely and scalably.
 - **Seamless Flask Integration**: A Flask server communicates with TensorFlow to classify uploaded images.
