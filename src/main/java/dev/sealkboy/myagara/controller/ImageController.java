@@ -3,7 +3,15 @@ package dev.sealkboy.myagara.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import dev.sealkboy.myagara.model.Image;
@@ -20,9 +28,9 @@ public class ImageController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<Image> uploadImage(@RequestParam("image") MultipartFile file) {
-        Image uploadedImage = imageService.uploadImage(file);
-        return ResponseEntity.ok(uploadedImage);
+    public ResponseEntity<String> uploadImage(@RequestParam("image") MultipartFile file) {
+        imageService.uploadImage(file);
+        return ResponseEntity.ok("Image Uploaded");
     }
 
     @GetMapping

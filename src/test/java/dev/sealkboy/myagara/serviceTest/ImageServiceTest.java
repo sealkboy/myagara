@@ -1,9 +1,4 @@
-package dev.sealkboy.myagara.service;
-
-public class ImageServiceTest {
-    
-}
-package dev.sealkboy.myagara.service;
+package dev.sealkboy.myagara.serviceTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -23,6 +18,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import dev.sealkboy.myagara.ml.TensorFlowClient;
 import dev.sealkboy.myagara.model.Image;
 import dev.sealkboy.myagara.repository.ImageRepository;
+import dev.sealkboy.myagara.service.ImageService;
 
 class ImageServiceTest {
 

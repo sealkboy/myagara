@@ -1,3 +1,4 @@
+package dev.sealkboy.myagara.controllerTest;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -19,10 +20,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
+import dev.sealkboy.myagara.ml.TensorFlowClient;
 import dev.sealkboy.myagara.model.Image;
 
 @ExtendWith(MockitoExtension.class)
-public class TensorFlowClientTest {
+public class ImageControllerTest {
 
     @Mock
     private RestTemplate restTemplate;
@@ -207,6 +209,16 @@ public class TensorFlowClientTest {
         // Act & Assert
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
             tensorFlowClient.classifyImage(mockImageFile);
+        });
+
+        assertEquals("Error connecting to Flask API", exception.getMessage());
+    }
+
+    @Test
+    public void classifyImage_shouldThrowRuntimeException_whenImageFileIsNull() {
+        // Act & Assert
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            tensorFlowClient.classifyImage(null);
         });
 
         assertEquals("Error connecting to Flask API", exception.getMessage());
