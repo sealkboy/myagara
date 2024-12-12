@@ -20,7 +20,6 @@ import dev.sealkboy.myagara.model.Image;
 @Component
 public class TensorFlowClient {
 
-    // Local Flask API URL
     private static final String FLASK_URL = "http://localhost:5000/classify";
 
     /**
@@ -32,18 +31,14 @@ public class TensorFlowClient {
         try {
             RestTemplate restTemplate = new RestTemplate();
 
-            // Prepare headers
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
-            // Prepare body with the image file
             MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
             body.add("image", new FileSystemResource(imageFile));
 
-            // Create the HTTP request
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
-            // Use exchange method for type-safe response handling
             ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
                 FLASK_URL,
                 HttpMethod.POST,
@@ -51,11 +46,9 @@ public class TensorFlowClient {
                 new ParameterizedTypeReference<Map<String, Object>>() {}
             );
 
-            // Handle response
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
                 Map<String, Object> responseBody = response.getBody();
 
-                // Extract data from the response and map it to the Image object
                 String label = (String) responseBody.getOrDefault("label", "unknown");
                 double confidence = Double.parseDouble(responseBody.getOrDefault("confidence", 0.0).toString());
 

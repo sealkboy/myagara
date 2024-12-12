@@ -1,4 +1,4 @@
-package dev.sealkboy.myagara.ml;
+package dev.sealkboy.myagara.mlTest;
 
 import java.io.File;
 import java.util.Map;
@@ -18,15 +18,13 @@ import org.springframework.web.client.RestTemplate;
 import dev.sealkboy.myagara.model.Image;
 
 @Component
-public class TensorFlowClient {
+public class TensorFlowClientTest {
 
-    // Local Flask API URL
     private static final String FLASK_URL = "http://localhost:5000/classify";
 
     /**
-     * Sends the image to the Flask API for classification.
-     * @param imageFile File object representing the image to classify.
-     * @return Image object with classification results.
+     * @param imageFile 
+     * @return 
      */
     public Image classifyImage(File imageFile) {
         if (imageFile == null) {
@@ -40,18 +38,18 @@ public class TensorFlowClient {
         try {
             RestTemplate restTemplate = new RestTemplate();
 
-            // Prepare headers
+
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
-            // Prepare body with the image file
+
             MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
             body.add("image", new FileSystemResource(imageFile));
 
-            // Create the HTTP request
+
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
-            // Use exchange method for type-safe response handling
+
             ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
                 FLASK_URL,
                 HttpMethod.POST,
@@ -59,7 +57,7 @@ public class TensorFlowClient {
                 new ParameterizedTypeReference<Map<String, Object>>() {}
             );
 
-            // Handle response
+
             if (response.getBody() == null) {
                 throw new RuntimeException("Response body is null");
             }

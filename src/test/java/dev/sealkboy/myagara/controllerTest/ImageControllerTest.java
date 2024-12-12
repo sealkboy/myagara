@@ -1,226 +1,130 @@
 package dev.sealkboy.myagara.controllerTest;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
+import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
-import dev.sealkboy.myagara.ml.TensorFlowClient;
+import dev.sealkboy.myagara.controller.ImageController;
 import dev.sealkboy.myagara.model.Image;
+import dev.sealkboy.myagara.service.ImageService;
 
-@ExtendWith(MockitoExtension.class)
-public class ImageControllerTest {
-
-    @Mock
-    private RestTemplate restTemplate;
+class ImageControllerTest {
 
     @InjectMocks
-    private TensorFlowClient tensorFlowClient;
+    private ImageController imageController;
 
-    private File mockImageFile;
+    @Mock
+    private ImageService imageService;
 
     @BeforeEach
-    public void setUp() {
-        mockImageFile = mock(File.class);
-        when(mockImageFile.exists()).thenReturn(true);
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void classifyImage_shouldReturnImageWithLabelAndConfidence_whenApiResponseIsSuccessful() {
-        // Arrange
-        Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("label", "dog");
-        responseBody.put("confidence", 0.95);
+    void testUploadImage() {
+        MultipartFile mockFile = mock(MultipartFile.class);
+        doNothing().when(imageService).uploadImage(mockFile);
 
-        ResponseEntity<Map<String, Object>> mockResponse = new ResponseEntity<>(
-            responseBody,
-            HttpStatus.OK
-        );
+        ResponseEntity<String> response = imageController.uploadImage(mockFile);
 
-        when(restTemplate.exchange(
-            eq("http://localhost:5000/classify"),
-            eq(HttpMethod.POST),
-            any(HttpEntity.class),
-            any(ParameterizedTypeReference.class)
-        )).thenReturn(mockResponse);
-
-        // Act
-        Image result = tensorFlowClient.classifyImage(mockImageFile);
-
-        // Assert
-        assertNotNull(result);
-        assertEquals("dog", result.getLabel());
-        assertEquals(0.95, result.getConfidence(), 0.001);
-
-        verify(restTemplate).exchange(
-            eq("http://localhost:5000/classify"),
-            eq(HttpMethod.POST),
-            any(HttpEntity.class),
-            any(ParameterizedTypeReference.class)
-        );
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCode().value());
+        assertEquals("Image Uploaded", response.getBody());
+        verify(imageService, times(1)).uploadImage(mockFile);
     }
 
     @Test
-    public void classifyImage_shouldThrowRuntimeException_whenApiResponseIsUnsuccessful() {
-        // Arrange
-        ResponseEntity<Map<String, Object>> mockResponse = new ResponseEntity<>(
-            null,
-            HttpStatus.INTERNAL_SERVER_ERROR
-        );
+    void testGetAllImages() {
+        Image mockImage1 = new Image();
+        mockImage1.setId("1");
+        mockImage1.setFilename("image1.jpg");
 
-        when(restTemplate.exchange(
-            eq("http://localhost:5000/classify"),
-            eq(HttpMethod.POST),
-            any(HttpEntity.class),
-            any(ParameterizedTypeReference.class)
-        )).thenReturn(mockResponse);
+        Image mockImage2 = new Image();
+        mockImage2.setId("2");
+        mockImage2.setFilename("image2.jpg");
 
-        // Act & Assert
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            tensorFlowClient.classifyImage(mockImageFile);
-        });
+        List<Image> mockImages = Arrays.asList(mockImage1, mockImage2);
+        when(imageService.getAllImages()).thenReturn(mockImages);
 
-        assertEquals("Failed to classify image. Status: 500 INTERNAL_SERVER_ERROR", exception.getMessage());
+        ResponseEntity<List<Image>> response = imageController.getAllImages();
 
-        verify(restTemplate).exchange(
-            eq("http://localhost:5000/classify"),
-            eq(HttpMethod.POST),
-            any(HttpEntity.class),
-            any(ParameterizedTypeReference.class)
-        );
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCode().value());
+        assertEquals(2, response.getBody().size());
+        verify(imageService, times(1)).getAllImages();
     }
 
     @Test
-    public void classifyImage_shouldThrowRuntimeException_whenConnectionFails() {
-        // Arrange
-        when(restTemplate.exchange(
-            eq("http://localhost:5000/classify"),
-            eq(HttpMethod.POST),
-            any(HttpEntity.class),
-            any(ParameterizedTypeReference.class)
-        )).thenThrow(new RuntimeException("Connection error"));
+    void testGetImageById() {
+        String id = "123";
+        Image mockImage = new Image();
+        mockImage.setId(id);
+        mockImage.setFilename("image.jpg");
 
-        // Act & Assert
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            tensorFlowClient.classifyImage(mockImageFile);
-        });
+        when(imageService.getImageById(id)).thenReturn(mockImage);
 
-        assertEquals("Error connecting to Flask API", exception.getMessage());
+        ResponseEntity<Image> response = imageController.getImageById(id);
+
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCode().value());
+        assertEquals(id, response.getBody().getId());
+        verify(imageService, times(1)).getImageById(id);
     }
 
     @Test
-    public void classifyImage_shouldUseDefaultConfidence_whenConfidenceIsNotPresent() {
-        // Arrange
-        Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("label", "cat");
+    void testUpdateImageMetadata() {
+        String id = "123";
+        Image updatedImage = new Image();
+        updatedImage.setFilename("updated_image.jpg");
 
-        ResponseEntity<Map<String, Object>> mockResponse = new ResponseEntity<>(
-            responseBody,
-            HttpStatus.OK
-        );
+        Image mockUpdatedImage = new Image();
+        mockUpdatedImage.setId(id);
+        mockUpdatedImage.setFilename("updated_image.jpg");
 
-        when(restTemplate.exchange(
-            eq("http://localhost:5000/classify"),
-            eq(HttpMethod.POST),
-            any(HttpEntity.class),
-            any(ParameterizedTypeReference.class)
-        )).thenReturn(mockResponse);
+        when(imageService.updateImageMetadata(eq(id), any(Image.class))).thenReturn(mockUpdatedImage);
 
-        // Act
-        Image result = tensorFlowClient.classifyImage(mockImageFile);
+        ResponseEntity<Image> response = imageController.updateImageMetadata(id, updatedImage);
 
-        // Assert
-        assertNotNull(result);
-        assertEquals("cat", result.getLabel());
-        assertEquals(0.0, result.getConfidence(), 0.001);
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCode().value());
+        assertEquals("updated_image.jpg", response.getBody().getFilename());
+        verify(imageService, times(1)).updateImageMetadata(eq(id), any(Image.class));
     }
 
     @Test
-    public void classifyImage_shouldReturnUnknownLabel_whenLabelIsNotPresent() {
-        // Arrange
-        Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("confidence", 0.8);
+    void testDeleteImageById() {
+        String id = "123";
+        doNothing().when(imageService).deleteImageById(id);
 
-        ResponseEntity<Map<String, Object>> mockResponse = new ResponseEntity<>(
-            responseBody,
-            HttpStatus.OK
-        );
+        ResponseEntity<String> response = imageController.deleteImageById(id);
 
-        when(restTemplate.exchange(
-            eq("http://localhost:5000/classify"),
-            eq(HttpMethod.POST),
-            any(HttpEntity.class),
-            any(ParameterizedTypeReference.class)
-        )).thenReturn(mockResponse);
-
-        // Act
-        Image result = tensorFlowClient.classifyImage(mockImageFile);
-
-        // Assert
-        assertNotNull(result);
-        assertEquals("unknown", result.getLabel());
-        assertEquals(0.8, result.getConfidence(), 0.001);
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCode().value());
+        assertEquals("Image Deleted", response.getBody());
+        verify(imageService, times(1)).deleteImageById(id);
     }
 
     @Test
-    public void classifyImage_shouldReturnImageWithDefaultValues_whenResponseBodyIsNull() {
-        // Arrange
-        ResponseEntity<Map<String, Object>> mockResponse = new ResponseEntity<>(
-            null,
-            HttpStatus.OK
-        );
+    void testDeleteAllImages() {
+        doNothing().when(imageService).deleteAllImages();
 
-        when(restTemplate.exchange(
-            eq("http://localhost:5000/classify"),
-            eq(HttpMethod.POST),
-            any(HttpEntity.class),
-            any(ParameterizedTypeReference.class)
-        )).thenReturn(mockResponse);
+        ResponseEntity<String> response = imageController.deleteAllImages();
 
-        // Act
-        Image result = tensorFlowClient.classifyImage(mockImageFile);
-
-        // Assert
-        assertNotNull(result);
-        assertEquals("unknown", result.getLabel());
-        assertEquals(0.0, result.getConfidence(), 0.001);
-    }
-
-    @Test
-    public void classifyImage_shouldThrowRuntimeException_whenImageFileDoesNotExist() {
-        // Arrange
-        when(mockImageFile.exists()).thenReturn(false);
-
-        // Act & Assert
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            tensorFlowClient.classifyImage(mockImageFile);
-        });
-
-        assertEquals("Error connecting to Flask API", exception.getMessage());
-    }
-
-    @Test
-    public void classifyImage_shouldThrowRuntimeException_whenImageFileIsNull() {
-        // Act & Assert
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            tensorFlowClient.classifyImage(null);
-        });
-
-        assertEquals("Error connecting to Flask API", exception.getMessage());
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCode().value());
+        assertEquals("All Images Deleted", response.getBody());
+        verify(imageService, times(1)).deleteAllImages();
     }
 }
