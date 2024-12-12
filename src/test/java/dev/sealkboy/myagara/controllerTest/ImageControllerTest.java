@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,15 +36,14 @@ class ImageControllerTest {
     @Test
     void testUploadImage() {
         MultipartFile mockFile = mock(MultipartFile.class);
-        doNothing().when(imageService).uploadImage(mockFile);
-
+        doReturn(new Image()).when(imageService).uploadImage(mockFile);
         ResponseEntity<String> response = imageController.uploadImage(mockFile);
-
         assertNotNull(response);
-        assertEquals(200, response.getStatusCode().value());
+        assertEquals(HttpStatus.OK, response.getStatusCode()); 
         assertEquals("Image Uploaded", response.getBody());
         verify(imageService, times(1)).uploadImage(mockFile);
     }
+
 
     @Test
     void testGetAllImages() {
