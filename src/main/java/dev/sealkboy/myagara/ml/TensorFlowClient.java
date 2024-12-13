@@ -27,6 +27,7 @@ public class TensorFlowClient {
      * @param imageFile 
      * @return 
      */
+    @SuppressWarnings("null")
     public Image classifyImage(File imageFile) {
         try {
             RestTemplate restTemplate = new RestTemplate();
